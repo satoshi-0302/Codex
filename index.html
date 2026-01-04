@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>年越しカウントダウン＆おみくじ</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: radial-gradient(circle at 20% 20%, #fdf5e6, #f7f0e9 40%, #e3d9c5 75%);
+        --bg-dark: radial-gradient(
+          circle at 20% 20%,
+          #161616,
+          #1f1b16 40%,
+          #1a1510 75%
+        );
+        --card-bg: rgba(255, 255, 255, 0.8);
+        --card-bg-dark: rgba(22, 22, 22, 0.7);
+        --accent: #c0392b;
+        --accent-2: #dba32a;
+        --text: #2b1c10;
+        --text-muted: #6b4f3a;
+        --text-dark: #f2e6d8;
+        --text-muted-dark: #d8c2a6;
+        font-family: "Hiragino Sans", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 24px 16px 32px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: var(--bg-dark);
+          color: var(--text-dark);
+        }
+      }
+
+      .wrapper {
+        width: 100%;
+        max-width: 520px;
+        display: grid;
+        gap: 16px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .emblem {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 22px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.35rem;
+        letter-spacing: 0.02em;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        backdrop-filter: blur(8px);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .card {
+          background: var(--card-bg-dark);
+          border-color: rgba(255, 255, 255, 0.06);
+          box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+        }
+      }
+
+      .section-title {
+        margin: 0 0 8px;
+        font-size: 1.05rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .pill {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(192, 57, 43, 0.12);
+        color: var(--accent);
+        border: 1px solid rgba(192, 57, 43, 0.25);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .pill {
+          background: rgba(219, 163, 42, 0.16);
+          color: var(--accent-2);
+          border-color: rgba(219, 163, 42, 0.3);
+        }
+      }
+
+      .countdown-time {
+        font-variant-numeric: tabular-nums;
+        font-size: 2.8rem;
+        margin: 4px 0;
+        letter-spacing: 0.08em;
+      }
+
+      .countdown-label {
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .countdown-label {
+          color: var(--text-muted-dark);
+        }
+      }
+
+      .omikuji {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      button {
+        appearance: none;
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--accent), #a92c1f);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        box-shadow: 0 10px 22px rgba(192, 57, 43, 0.25);
+        transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      }
+
+      button:disabled {
+        opacity: 0.75;
+        box-shadow: none;
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .result {
+        background: linear-gradient(135deg, rgba(219, 163, 42, 0.14), rgba(219, 163, 42, 0.05));
+        border: 1px dashed rgba(219, 163, 42, 0.4);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+
+      .result-title {
+        margin: 0;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .result-comment {
+        margin: 6px 0 0;
+        color: var(--text-muted);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .result {
+          background: linear-gradient(135deg, rgba(219, 163, 42, 0.16), rgba(219, 163, 42, 0.08));
+          border-color: rgba(219, 163, 42, 0.45);
+        }
+        .result-comment {
+          color: var(--text-muted-dark);
+        }
+      }
+
+      footer {
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        footer {
+          color: var(--text-muted-dark);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrapper">
+      <header>
+        <div class="emblem" aria-hidden="true">寅</div>
+        <div>
+          <h1>年越しカウントダウンとおみくじ</h1>
+          <p class="countdown-label">JST（日本時間）で次の0:00までを表示します。</p>
+        </div>
+      </header>
+
+      <section class="card" aria-labelledby="countdown-title">
+        <div class="section-title">
+          <span id="countdown-title">年越しカウントダウン</span>
+          <span class="pill">次の0:00まで</span>
+        </div>
+        <div class="countdown-time" id="countdown">--:--:--</div>
+        <p class="countdown-label" id="countdown-detail">準備中...</p>
+      </section>
+
+      <section class="card omikuji" aria-labelledby="omikuji-title">
+        <div class="section-title">
+          <span id="omikuji-title">本日のおみくじ</span>
+          <span class="pill">1日1回まで</span>
+        </div>
+        <button id="draw-button" type="button">おみくじを引く</button>
+        <div class="result" aria-live="polite">
+          <p class="result-title" id="result-title">まだ結果はありません</p>
+          <p class="result-comment" id="result-comment">ボタンを押してみてください。</p>
+        </div>
+      </section>
+
+      <footer>新しい年がすてきな一日になりますように。</footer>
+    </main>
+
+    <script>
+      const tokyoNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+
+      function updateCountdown() {
+        const now = tokyoNow();
+        const target = new Date(now);
+        target.setHours(24, 0, 0, 0);
+        const diff = target - now;
+
+        if (diff <= 0) {
+          document.getElementById("countdown").textContent = "00:00:00";
+          document.getElementById("countdown-detail").textContent = "まもなく新しい一日が始まります。";
+          return;
+        }
+
+        const totalSeconds = Math.floor(diff / 1000);
+        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+        const seconds = String(totalSeconds % 60).padStart(2, "0");
+
+        document.getElementById("countdown").textContent = `${hours}:${minutes}:${seconds}`;
+        const targetDate = target.toLocaleDateString("ja-JP", {
+          month: "long",
+          day: "numeric",
+          weekday: "short",
+          timeZone: "Asia/Tokyo"
+        });
+        document.getElementById(
+          "countdown-detail"
+        ).textContent = `${targetDate} 0:00 まであと ${hours}時間${minutes}分${seconds}秒`;
+      }
+
+      const omikujiList = [
+        { title: "大吉", comment: "最高の流れ。願い事は思い切って進めましょう。" },
+        { title: "中吉", comment: "小さな積み重ねが大きな結果に。丁寧に過ごせば吉。" },
+        { title: "小吉", comment: "焦らず穏やかに。足元を固めると運が開けます。" },
+        { title: "吉", comment: "静かな追い風。人の優しさに助けられる予感。" },
+        { title: "末吉", comment: "先を急がず準備に徹すると吉。休息も忘れずに。" },
+        { title: "凶", comment: "無理は禁物。早めの休息と感謝が厄よけに。" }
+      ];
+
+      function todayKey() {
+        const now = tokyoNow();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const d = String(now.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+      }
+
+      function renderResult(result) {
+        const { title, comment } = result;
+        document.getElementById("result-title").textContent = title;
+        document.getElementById("result-comment").textContent = comment;
+      }
+
+      function loadOmikuji() {
+        const key = todayKey();
+        const stored = localStorage.getItem("omikuji-result");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (parsed.date === key && parsed.result) {
+              renderResult(parsed.result);
+              document.getElementById("draw-button").disabled = true;
+              document.getElementById("draw-button").textContent = "また明日";
+              return;
+            }
+          } catch (e) {
+            /* ignore corrupted data */
+          }
+        }
+        document.getElementById("draw-button").disabled = false;
+        document.getElementById("draw-button").textContent = "おみくじを引く";
+        renderResult({ title: "まだ結果はありません", comment: "ボタンを押してみてください。" });
+      }
+
+      function drawOmikuji() {
+        const result = omikujiList[Math.floor(Math.random() * omikujiList.length)];
+        localStorage.setItem("omikuji-result", JSON.stringify({ date: todayKey(), result }));
+        renderResult(result);
+        document.getElementById("draw-button").disabled = true;
+        document.getElementById("draw-button").textContent = "また明日";
+      }
+
+      document.getElementById("draw-button").addEventListener("click", drawOmikuji);
+      loadOmikuji();
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    </script>
+  </body>
+</html>
